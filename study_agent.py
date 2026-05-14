@@ -151,10 +151,11 @@ init_session()
 
 # ─── GROQ API ──────────────────────────────────────────────────
 GROQ_MODELS = [
-    "meta-llama/llama-3.3-70b-instruct:free",
-    "meta-llama/llama-3.1-8b-instruct:free",
-    "google/gemma-2-9b-it:free",
-    "mistralai/mistral-7b-instruct:free",
+    "deepseek/deepseek-chat-v3-0324:free",
+    "deepseek/deepseek-r1:free",
+    "meta-llama/llama-3.2-3b-instruct:free",
+    "qwen/qwen-2.5-7b-instruct:free",
+    "microsoft/phi-3-mini-128k-instruct:free",
 ]
 
 def ask_groq(prompt: str, system: str, api_key: str, max_tokens: int = 2000) -> str | None:
@@ -222,7 +223,7 @@ with st.sidebar:
     st.markdown("## 🎓 StudyMate AI")
     st.markdown("---")
     api_key = st.text_input(
-        "🔑 Groq API Key",
+        "🔑 OpenRouter API Key",
         type="password",
         placeholder="sk-or-...",
         help="Free key: openrouter.ai"
