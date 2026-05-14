@@ -151,11 +151,9 @@ init_session()
 
 # ─── GROQ API ──────────────────────────────────────────────────
 GROQ_MODELS = [
-    "deepseek/deepseek-chat-v3-0324:free",
-    "deepseek/deepseek-r1:free",
+    "openrouter/free",
     "meta-llama/llama-3.2-3b-instruct:free",
-    "qwen/qwen-2.5-7b-instruct:free",
-    "microsoft/phi-3-mini-128k-instruct:free",
+    "meta-llama/llama-3.2-1b-instruct:free",
 ]
 
 def ask_groq(prompt: str, system: str, api_key: str, max_tokens: int = 2000) -> str | None:
