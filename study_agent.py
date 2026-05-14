@@ -11,6 +11,20 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# PWA Meta Tags
+st.markdown("""
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0e1a">
+    <meta name="description" content="StudyMate AI — Your intelligent study companion powered by AI">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="StudyMate AI">
+    <link rel="manifest" href="/manifest.json">
+</head>
+""", unsafe_allow_html=True)
+
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
