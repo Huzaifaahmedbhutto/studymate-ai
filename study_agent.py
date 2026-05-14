@@ -169,13 +169,15 @@ html, body, .stApp {
     color: #fff !important;
     border: none !important;
     border-radius: 10px !important;
-    padding: 0.65rem 1.8rem !important;
-    font-size: 0.95rem !important;
+    padding: 0.65rem 0.8rem !important;
+    font-size: 0.82rem !important;
     font-weight: 600 !important;
     font-family: 'Space Grotesk', sans-serif !important;
     cursor: pointer !important;
     transition: all 0.3s ease !important;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
+    white-space: nowrap !important;
+    width: 100% !important;
 }
 .stButton > button:hover {
     transform: translateY(-2px) !important;
