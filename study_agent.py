@@ -4,7 +4,6 @@ import json
 import time
 import re
 
-# ─── PAGE CONFIG ───────────────────────────────────────────────
 st.set_page_config(
     page_title="StudyMate AI",
     page_icon="🎓",
@@ -12,352 +11,125 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ─── CUSTOM CSS ────────────────────────────────────────────────
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
 
-/* ── Global Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html, body, .stApp {
-    background: #0a0e1a !important;
-    color: #e2e8f0 !important;
-    font-family: 'Space Grotesk', sans-serif !important;
-}
-
-/* ── Hide Streamlit branding ── */
+html, body, .stApp { background: #0a0e1a !important; color: #e2e8f0 !important; font-family: 'Space Grotesk', sans-serif !important; }
 #MainMenu, footer, header { visibility: hidden; }
 .stDeployButton { display: none; }
-
-/* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #0d1220; }
 ::-webkit-scrollbar-thumb { background: #2d6a4f; border-radius: 3px; }
+.main .block-container { padding: 2rem 2.5rem !important; max-width: 1200px; }
 
-/* ── Main container ── */
-.main .block-container {
-    padding: 2rem 2.5rem !important;
-    max-width: 1200px;
-}
-
-/* ── Hero Header ── */
 .hero-header {
     background: linear-gradient(135deg, #0d2137 0%, #0a1628 40%, #0d2137 100%);
-    border: 1px solid rgba(45, 106, 79, 0.3);
-    border-radius: 20px;
-    padding: 2.5rem 3rem;
-    margin-bottom: 2rem;
-    position: relative;
-    overflow: hidden;
+    border: 1px solid rgba(45,106,79,0.3); border-radius: 20px;
+    padding: 2.5rem 3rem; margin-bottom: 2rem; position: relative; overflow: hidden;
 }
 .hero-header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 400px;
-    height: 400px;
+    content: ''; position: absolute; top: -50%; right: -10%;
+    width: 400px; height: 400px;
     background: radial-gradient(circle, rgba(45,106,79,0.15) 0%, transparent 70%);
     pointer-events: none;
 }
 .hero-title {
-    font-size: 2.4rem;
-    font-weight: 700;
+    font-size: 2.4rem; font-weight: 700;
     background: linear-gradient(135deg, #52b788, #95d5b2, #52b788);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 0.4rem;
-    letter-spacing: -0.5px;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: 0.4rem; letter-spacing: -0.5px;
 }
-.hero-subtitle {
-    font-size: 1rem;
-    color: #74c69d;
-    font-weight: 400;
-    opacity: 0.85;
-}
+.hero-subtitle { font-size: 1rem; color: #74c69d; font-weight: 400; opacity: 0.85; }
 
-/* ── Mode Cards ── */
-.mode-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-.mode-card {
-    background: #0d1a2e;
-    border: 1px solid rgba(82,183,136,0.15);
-    border-radius: 14px;
-    padding: 1.2rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
-}
-.mode-card:hover, .mode-card.active {
-    border-color: rgba(82,183,136,0.6);
-    background: rgba(82,183,136,0.07);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(82,183,136,0.15);
-}
-.mode-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-.mode-label { font-size: 0.85rem; font-weight: 600; color: #95d5b2; }
+.section-title { font-size: 1.3rem; font-weight: 700; color: #52b788; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
 
-/* ── Cards / Sections ── */
-.content-card {
-    background: #0d1a2e;
-    border: 1px solid rgba(82,183,136,0.15);
-    border-radius: 16px;
-    padding: 2rem;
-    margin-bottom: 1.5rem;
-}
-.section-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #52b788;
-    margin-bottom: 1.2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-/* ── Inputs ── */
 .stTextInput > div > div > input,
 .stTextArea > div > div > textarea,
 .stSelectbox > div > div > div {
-    background: #0a1628 !important;
-    border: 1px solid rgba(82,183,136,0.25) !important;
-    border-radius: 10px !important;
-    color: #e2e8f0 !important;
-    font-family: 'Space Grotesk', sans-serif !important;
-    font-size: 0.95rem !important;
+    background: #0a1628 !important; border: 1px solid rgba(82,183,136,0.25) !important;
+    border-radius: 10px !important; color: #e2e8f0 !important;
+    font-family: 'Space Grotesk', sans-serif !important; font-size: 0.95rem !important;
 }
 .stTextInput > div > div > input:focus,
 .stTextArea > div > div > textarea:focus {
-    border-color: #52b788 !important;
-    box-shadow: 0 0 0 3px rgba(82,183,136,0.15) !important;
+    border-color: #52b788 !important; box-shadow: 0 0 0 3px rgba(82,183,136,0.15) !important;
 }
-
-/* ── Labels ── */
-.stTextInput label, .stTextArea label,
-.stSelectbox label, .stSlider label,
-.stRadio label, .stFileUploader label {
-    color: #95d5b2 !important;
-    font-weight: 600 !important;
-    font-size: 0.9rem !important;
-    margin-bottom: 0.3rem !important;
+.stTextInput label, .stTextArea label, .stSelectbox label,
+.stSlider label, .stRadio label, .stFileUploader label {
+    color: #95d5b2 !important; font-weight: 600 !important; font-size: 0.9rem !important;
 }
-
-/* ── Radio ── */
 .stRadio > div { gap: 0.5rem !important; }
 .stRadio > div > label {
-    background: #0a1628 !important;
-    border: 1px solid rgba(82,183,136,0.2) !important;
-    border-radius: 10px !important;
-    padding: 0.5rem 1rem !important;
-    color: #e2e8f0 !important;
-    transition: all 0.2s !important;
+    background: #0a1628 !important; border: 1px solid rgba(82,183,136,0.2) !important;
+    border-radius: 10px !important; padding: 0.5rem 1rem !important; color: #e2e8f0 !important; transition: all 0.2s !important;
 }
-.stRadio > div > label:hover {
-    border-color: #52b788 !important;
-    background: rgba(82,183,136,0.08) !important;
-}
+.stRadio > div > label:hover { border-color: #52b788 !important; background: rgba(82,183,136,0.08) !important; }
 
-/* ── Buttons ── */
 .stButton > button {
     background: linear-gradient(135deg, #2d6a4f, #52b788) !important;
-    color: #fff !important;
-    border: none !important;
-    border-radius: 10px !important;
-    padding: 0.65rem 0.8rem !important;
-    font-size: 0.82rem !important;
-    font-weight: 600 !important;
-    font-family: 'Space Grotesk', sans-serif !important;
-    cursor: pointer !important;
-    transition: all 0.3s ease !important;
-    letter-spacing: 0.2px;
-    white-space: nowrap !important;
-    width: 100% !important;
+    color: #fff !important; border: none !important; border-radius: 10px !important;
+    padding: 0.65rem 0.8rem !important; font-size: 0.82rem !important; font-weight: 600 !important;
+    font-family: 'Space Grotesk', sans-serif !important; cursor: pointer !important;
+    transition: all 0.3s ease !important; white-space: nowrap !important; width: 100% !important;
 }
 .stButton > button:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 25px rgba(82,183,136,0.4) !important;
+    transform: translateY(-2px) !important; box-shadow: 0 8px 25px rgba(82,183,136,0.4) !important;
     background: linear-gradient(135deg, #52b788, #74c69d) !important;
 }
-.stButton > button:active { transform: translateY(0) !important; }
-
-/* Download button variant */
 .stDownloadButton > button {
-    background: transparent !important;
-    border: 1px solid rgba(82,183,136,0.4) !important;
-    color: #74c69d !important;
-    border-radius: 10px !important;
-    font-family: 'Space Grotesk', sans-serif !important;
-    font-weight: 600 !important;
-    transition: all 0.3s !important;
+    background: transparent !important; border: 1px solid rgba(82,183,136,0.4) !important;
+    color: #74c69d !important; border-radius: 10px !important;
+    font-family: 'Space Grotesk', sans-serif !important; font-weight: 600 !important; transition: all 0.3s !important;
 }
-.stDownloadButton > button:hover {
-    background: rgba(82,183,136,0.1) !important;
-    border-color: #52b788 !important;
-}
+.stDownloadButton > button:hover { background: rgba(82,183,136,0.1) !important; border-color: #52b788 !important; }
 
-/* ── Result Box ── */
 .result-box {
-    background: #071020;
-    border: 1px solid rgba(82,183,136,0.25);
-    border-left: 4px solid #52b788;
-    border-radius: 12px;
-    padding: 1.8rem;
-    margin-top: 1.2rem;
-    line-height: 1.8;
-    font-size: 0.95rem;
-    color: #d1fae5;
+    background: #071020; border: 1px solid rgba(82,183,136,0.25);
+    border-left: 4px solid #52b788; border-radius: 12px;
+    padding: 1.8rem; margin-top: 1.2rem; line-height: 1.8; font-size: 0.95rem; color: #d1fae5;
 }
 
-/* ── Chat styles ── */
 .chat-message-user {
-    background: rgba(82,183,136,0.1);
-    border: 1px solid rgba(82,183,136,0.2);
-    border-radius: 14px 14px 4px 14px;
-    padding: 1rem 1.2rem;
-    margin: 0.5rem 0 0.5rem 3rem;
-    font-size: 0.92rem;
-    color: #e2e8f0;
+    background: rgba(82,183,136,0.1); border: 1px solid rgba(82,183,136,0.2);
+    border-radius: 14px 14px 4px 14px; padding: 1rem 1.2rem;
+    margin: 0.5rem 0 0.5rem 3rem; font-size: 0.92rem; color: #e2e8f0;
 }
 .chat-message-ai {
-    background: #0d1a2e;
-    border: 1px solid rgba(82,183,136,0.15);
-    border-radius: 14px 14px 14px 4px;
-    padding: 1rem 1.2rem;
-    margin: 0.5rem 3rem 0.5rem 0;
-    font-size: 0.92rem;
-    color: #d1fae5;
-    line-height: 1.7;
+    background: #0d1a2e; border: 1px solid rgba(82,183,136,0.15);
+    border-radius: 14px 14px 14px 4px; padding: 1rem 1.2rem;
+    margin: 0.5rem 3rem 0.5rem 0; font-size: 0.92rem; color: #d1fae5; line-height: 1.7;
 }
 .chat-label-user { font-size: 0.75rem; color: #52b788; font-weight: 700; text-align: right; margin-right: 0.5rem; }
-.chat-label-ai   { font-size: 0.75rem; color: #74c69d; font-weight: 700; margin-left: 0.5rem; }
+.chat-label-ai { font-size: 0.75rem; color: #74c69d; font-weight: 700; margin-left: 0.5rem; }
 
-/* ── Quiz ── */
-.quiz-question {
-    background: #071020;
-    border: 1px solid rgba(82,183,136,0.2);
-    border-radius: 12px;
-    padding: 1.2rem 1.5rem;
-    margin-bottom: 1rem;
-}
-.quiz-question-num {
-    font-size: 0.75rem;
-    color: #52b788;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 0.4rem;
-}
-.quiz-question-text {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #e2e8f0;
-    margin-bottom: 0.8rem;
-}
+.quiz-question-num { font-size: 0.75rem; color: #52b788; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.4rem; }
+.quiz-question-text { font-size: 1rem; font-weight: 600; color: #e2e8f0; margin-bottom: 0.8rem; }
 
-/* ── Score badge ── */
 .score-badge {
-    background: linear-gradient(135deg, #2d6a4f, #1b4332);
-    border: 1px solid #52b788;
-    border-radius: 12px;
-    padding: 1.2rem 2rem;
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #95d5b2;
-    margin: 1rem 0;
+    background: linear-gradient(135deg, #2d6a4f, #1b4332); border: 1px solid #52b788;
+    border-radius: 12px; padding: 1.2rem 2rem; text-align: center;
+    font-size: 1.5rem; font-weight: 700; color: #95d5b2; margin: 1rem 0;
 }
 
-/* ── Sidebar ── */
-[data-testid="stSidebar"] {
-    background: #07111e !important;
-    border-right: 1px solid rgba(82,183,136,0.15) !important;
-}
-[data-testid="stSidebar"] .stMarkdown h2,
-[data-testid="stSidebar"] .stMarkdown h3 {
-    color: #52b788 !important;
-}
+[data-testid="stSidebar"] { background: #07111e !important; border-right: 1px solid rgba(82,183,136,0.15) !important; }
+[data-testid="stSidebar"] .stMarkdown h2, [data-testid="stSidebar"] .stMarkdown h3 { color: #52b788 !important; }
 
-/* ── Slider ── */
-.stSlider > div > div > div > div {
-    background: linear-gradient(90deg, #2d6a4f, #52b788) !important;
-}
-
-/* ── Alert / Info ── */
-.stAlert {
-    background: rgba(82,183,136,0.08) !important;
-    border: 1px solid rgba(82,183,136,0.25) !important;
-    border-radius: 10px !important;
-    color: #95d5b2 !important;
-}
-
-/* ── Spinner ── */
-.stSpinner > div { border-top-color: #52b788 !important; }
-
-/* ── Divider ── */
+.stSlider > div > div > div > div { background: linear-gradient(90deg, #2d6a4f, #52b788) !important; }
+.stAlert { background: rgba(82,183,136,0.08) !important; border: 1px solid rgba(82,183,136,0.25) !important; border-radius: 10px !important; color: #95d5b2 !important; }
 hr { border-color: rgba(82,183,136,0.15) !important; }
 
-/* ── Tabs ── */
-.stTabs [data-baseweb="tab-list"] {
-    background: transparent !important;
-    gap: 0.5rem !important;
-}
+.stTabs [data-baseweb="tab-list"] { background: transparent !important; gap: 0.5rem !important; }
 .stTabs [data-baseweb="tab"] {
-    background: #0d1a2e !important;
-    border: 1px solid rgba(82,183,136,0.2) !important;
-    border-radius: 10px !important;
-    color: #74c69d !important;
-    font-family: 'Space Grotesk', sans-serif !important;
-    font-weight: 600 !important;
-    padding: 0.5rem 1.2rem !important;
+    background: #0d1a2e !important; border: 1px solid rgba(82,183,136,0.2) !important;
+    border-radius: 10px !important; color: #74c69d !important;
+    font-family: 'Space Grotesk', sans-serif !important; font-weight: 600 !important; padding: 0.5rem 1.2rem !important;
 }
-.stTabs [aria-selected="true"] {
-    background: linear-gradient(135deg, #2d6a4f, #1b4332) !important;
-    border-color: #52b788 !important;
-    color: #d1fae5 !important;
-}
+.stTabs [aria-selected="true"] { background: linear-gradient(135deg, #2d6a4f, #1b4332) !important; border-color: #52b788 !important; color: #d1fae5 !important; }
 
-/* ── File uploader ── */
-[data-testid="stFileUploader"] {
-    background: #0a1628 !important;
-    border: 1px dashed rgba(82,183,136,0.3) !important;
-    border-radius: 12px !important;
-}
-
-/* ── Progress bar ── */
-.stProgress > div > div > div > div {
-    background: linear-gradient(90deg, #2d6a4f, #52b788) !important;
-}
-
-/* ── Select slider ── */
-.stSelectSlider > div { color: #e2e8f0 !important; }
-
-/* ── Tag chip ── */
-.tag-chip {
-    display: inline-block;
-    background: rgba(82,183,136,0.12);
-    border: 1px solid rgba(82,183,136,0.3);
-    border-radius: 20px;
-    padding: 0.2rem 0.8rem;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #74c69d;
-    margin: 0.2rem;
-}
-
-/* ── Metric ── */
-[data-testid="stMetricValue"] {
-    color: #52b788 !important;
-    font-family: 'Space Grotesk', sans-serif !important;
-    font-weight: 700 !important;
-}
+[data-testid="stMetricValue"] { color: #52b788 !important; font-family: 'Space Grotesk', sans-serif !important; font-weight: 700 !important; }
 [data-testid="stMetricLabel"] { color: #74c69d !important; }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -377,48 +149,55 @@ def init_session():
 
 init_session()
 
-# ─── GEMINI API ────────────────────────────────────────────────
-MODELS = [
-    "gemini-1.5-flash-latest",
-    "gemini-1.5-flash",
-    "gemini-1.5-flash-8b",
-    "gemini-1.0-pro",
+# ─── GROQ API ──────────────────────────────────────────────────
+GROQ_MODELS = [
+    "meta-llama/llama-3.3-70b-instruct:free",
+    "meta-llama/llama-3.1-8b-instruct:free",
+    "google/gemma-2-9b-it:free",
+    "mistralai/mistral-7b-instruct:free",
 ]
 
-def ask_gemini(prompt: str, system: str, api_key: str, max_tokens: int = 2000) -> str | None:
+def ask_groq(prompt: str, system: str, api_key: str, max_tokens: int = 2000) -> str | None:
     if not api_key:
-        st.error("⚠️ Sidebar mein Gemini API key daalo!")
+        st.error("⚠️ Sidebar mein Groq API key daalo!")
         return None
 
-    full = f"{system}\n\n{prompt}"
-    for model in MODELS:
+    for model in GROQ_MODELS:
         try:
-            url = (
-                f"https://generativelanguage.googleapis.com/v1/models/"
-                f"{model}:generateContent?key={api_key}"
-            )
-            payload = {
-                "contents": [{"parts": [{"text": full}]}],
-                "generationConfig": {
-                    "temperature": 0.7,
-                    "maxOutputTokens": max_tokens
-                },
+            url = "https://openrouter.ai/api/v1/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
             }
-            r = requests.post(url, json=payload, timeout=40)
+            payload = {
+                "model": model,
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": prompt}
+                ],
+                "max_tokens": max_tokens,
+                "temperature": 0.7
+            }
+            r = requests.post(url, headers=headers, json=payload, timeout=40)
             data = r.json()
+
             if r.status_code == 200:
-                return data["candidates"][0]["content"]["parts"][0]["text"]
-            err = data.get("error", {}).get("message", "")
-            if "quota" in err.lower():
-                st.warning(f"⏳ {model} quota exceed — next model try ho raha hai...")
-                time.sleep(1)
+                return data["choices"][0]["message"]["content"]
+            elif r.status_code == 429:
+                st.warning(f"⏳ {model} busy hai — next try ho raha hai...")
+                time.sleep(2)
                 continue
-        except Exception:
+            else:
+                err = data.get("error", {}).get("message", "Unknown error")
+                st.warning(f"⚠️ {model}: {err}")
+                continue
+        except Exception as e:
             continue
+
     st.error("❌ Koi model available nahi. API key check karo.")
     return None
 
-# ─── PDF TEXT EXTRACTOR ─────────────────────────────────────────
+# ─── PDF EXTRACTOR ─────────────────────────────────────────────
 def extract_pdf_text(uploaded_file) -> str:
     try:
         import io
@@ -431,12 +210,10 @@ def extract_pdf_text(uploaded_file) -> str:
         try:
             import PyPDF2
             reader = PyPDF2.PdfReader(io.BytesIO(uploaded_file.read()))
-            return "\n".join(
-                p.extract_text() or "" for p in reader.pages
-            )
+            return "\n".join(p.extract_text() or "" for p in reader.pages)
         except ImportError:
             pass
-        return "PDF library nahi mili. 'pip install pypdf' run karo."
+        return "PDF library nahi mili. requirements.txt mein pypdf add karo."
     except Exception as e:
         return f"PDF read nahi hua: {e}"
 
@@ -445,34 +222,34 @@ with st.sidebar:
     st.markdown("## 🎓 StudyMate AI")
     st.markdown("---")
     api_key = st.text_input(
-        "🔑 Gemini API Key",
+        "🔑 Groq API Key",
         type="password",
-        placeholder="AIza...",
-        help="Google AI Studio se free key lo: aistudio.google.com"
+        placeholder="sk-or-...",
+        help="Free key: openrouter.ai"
     )
     if api_key:
         st.success("✅ API Key set!")
     else:
-        st.info("👆 API key daalo shuru karne ke liye")
+        st.info("👆 openrouter.ai se free key lo")
 
     st.markdown("---")
     st.markdown("### 📊 Session Stats")
     c1, c2 = st.columns(2)
     c1.metric("Chat Msgs", len(st.session_state.chat_history))
-    c2.metric("Quiz Score", f"{st.session_state.quiz_score}")
+    c2.metric("Quiz Score", str(st.session_state.quiz_score))
 
     st.markdown("---")
-    if st.button("🗑️ Chat History Clear"):
+    if st.button("🗑️ Chat Clear"):
         st.session_state.chat_history = []
         st.rerun()
 
     st.markdown("---")
     st.markdown(
-        "<p style='font-size:0.78rem; color:#52b788;'>Built by <b>Huzaifa</b> 🚀<br/>Powered by Google Gemini</p>",
+        "<p style='font-size:0.78rem; color:#52b788;'>Built by <b>Huzaifa</b> 🚀<br/>Powered by OpenRouter + LLaMA</p>",
         unsafe_allow_html=True,
     )
 
-# ─── HERO HEADER ───────────────────────────────────────────────
+# ─── HERO ──────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero-header">
     <div class="hero-title">🎓 StudyMate AI</div>
@@ -480,19 +257,18 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ─── MODE SELECTION ────────────────────────────────────────────
+# ─── MODE BUTTONS ──────────────────────────────────────────────
 MODES = {
-    "explain":  ("💡", "Topic Explain"),
-    "summarize":("📝", "Notes Summarize"),
-    "quiz":     ("❓", "Quiz Mode"),
-    "plan":     ("📅", "Study Plan"),
-    "chat":     ("💬", "AI Chat"),
+    "explain":   ("💡", "Topic Explain"),
+    "summarize": ("📝", "Notes Summarize"),
+    "quiz":      ("❓", "Quiz Mode"),
+    "plan":      ("📅", "Study Plan"),
+    "chat":      ("💬", "AI Chat"),
 }
 
 cols = st.columns(len(MODES))
 for col, (key, (icon, label)) in zip(cols, MODES.items()):
     with col:
-        active = "active" if st.session_state.mode == key else ""
         if st.button(f"{icon} {label}", key=f"mode_{key}"):
             st.session_state.mode = key
             st.rerun()
@@ -517,7 +293,6 @@ if mode == "explain":
         level = st.select_slider("Level", ["Beginner 🟢", "Intermediate 🟡", "Advanced 🔴"])
         lang  = st.selectbox("Language", ["Hinglish", "English", "Urdu"])
 
-    # Optional PDF upload
     with st.expander("📄 Ya PDF upload karo (optional)"):
         pdf_file = st.file_uploader("PDF Upload", type=["pdf"], key="explain_pdf")
 
@@ -528,23 +303,19 @@ if mode == "explain":
             context = ""
             if pdf_file:
                 with st.spinner("PDF pad raha hoon..."):
-                    context = extract_pdf_text(pdf_file)
-                    context = context[:4000]  # limit
+                    context = extract_pdf_text(pdf_file)[:4000]
 
             with st.spinner("AI soch raha hai... ⏳"):
                 system = (
                     f"You are StudyMate, a friendly AI study assistant for Pakistani university students. "
                     f"Always respond in {lang} (mix of Urdu and English if Hinglish). "
-                    f"Structure your answer as: "
-                    f"1) Simple definition 2) Easy explanation with relatable example "
-                    f"3) Key points to remember (bullet form) 4) One common exam question on this topic. "
-                    f"Be encouraging and friendly."
+                    f"Structure: 1) Simple definition 2) Easy explanation with example "
+                    f"3) Key points bullet form 4) One common exam question. Be encouraging."
                 )
                 query = f"Explain '{topic}' from {subject} at {level} level."
                 if context:
-                    query += f"\n\nReference material:\n{context}"
-
-                result = ask_gemini(query, system, api_key, max_tokens=2000)
+                    query += f"\n\nReference:\n{context}"
+                result = ask_groq(query, system, api_key, 2000)
 
             if result:
                 st.markdown(f'<div class="result-box">{result}</div>', unsafe_allow_html=True)
@@ -557,41 +328,36 @@ elif mode == "summarize":
     st.markdown('<div class="section-title">📝 Notes Summarize Karo</div>', unsafe_allow_html=True)
 
     tab1, tab2 = st.tabs(["✏️ Text Paste Karo", "📄 PDF Upload Karo"])
-
     with tab1:
-        notes = st.text_area("Yahan notes paste karo:", height=220, placeholder="Apne notes yahan paste karo...")
-
+        notes = st.text_area("Notes paste karo:", height=220, placeholder="Apne notes yahan paste karo...")
     with tab2:
         pdf_up = st.file_uploader("PDF Upload", type=["pdf"], key="sum_pdf")
         notes_from_pdf = ""
         if pdf_up:
             with st.spinner("PDF se text nikal raha hoon..."):
                 notes_from_pdf = extract_pdf_text(pdf_up)
-            st.success(f"✅ PDF read ho gaya! ({len(notes_from_pdf)} characters)")
+            st.success(f"✅ PDF read ho gaya!")
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        length = st.selectbox("Summary Length", ["Short — 5 Points", "Medium — 10 Points", "Detailed"])
+        length = st.selectbox("Length", ["Short — 5 Points", "Medium — 10 Points", "Detailed"])
     with col2:
-        lang2  = st.selectbox("Language", ["Hinglish", "English", "Urdu"], key="lang_sum")
+        lang2 = st.selectbox("Language", ["Hinglish", "English", "Urdu"], key="lang_sum")
     with col3:
-        focus  = st.selectbox("Focus On", ["Key Concepts", "Exam Points", "Definitions", "All"])
+        focus = st.selectbox("Focus", ["Key Concepts", "Exam Points", "Definitions", "All"])
 
     if st.button("📝 Summarize Karo", key="btn_sum"):
         raw = notes or notes_from_pdf
         if not raw.strip():
-            st.warning("Pehle notes paste karo ya PDF upload karo!")
+            st.warning("Notes paste karo ya PDF upload karo!")
         else:
             with st.spinner("Notes process ho rahe hain... ⏳"):
                 system = (
                     f"You are StudyMate for Pakistani university students. "
-                    f"Summarize the given notes in {lang2}. "
-                    f"Focus on {focus}. Use clear headings, bullet points, and bold keywords. "
-                    f"Make it exam-ready and concise."
+                    f"Summarize in {lang2}. Focus on {focus}. "
+                    f"Use clear headings, bullet points, bold keywords. Make it exam-ready."
                 )
-                query = f"Summarize in '{length}' format:\n\n{raw[:5000]}"
-                result = ask_gemini(query, system, api_key, max_tokens=2000)
-
+                result = ask_groq(f"Summarize in '{length}' format:\n\n{raw[:5000]}", system, api_key, 2000)
             if result:
                 st.markdown(f'<div class="result-box">{result}</div>', unsafe_allow_html=True)
                 st.download_button("📥 Download Summary", result, file_name="summary.txt", key="dl_sum")
@@ -604,11 +370,11 @@ elif mode == "quiz":
 
     col1, col2 = st.columns(2)
     with col1:
-        quiz_topic  = st.text_input("Topic", placeholder="e.g. Photosynthesis, OOP, Networking")
-        num_q       = st.slider("Questions", 3, 10, 5)
+        quiz_topic = st.text_input("Topic", placeholder="e.g. OOP, Networking, Photosynthesis")
+        num_q      = st.slider("Questions", 3, 10, 5)
     with col2:
-        difficulty  = st.selectbox("Difficulty", ["Easy 🟢", "Medium 🟡", "Hard 🔴"])
-        q_type      = st.selectbox("Type", ["MCQs", "True/False", "Short Answer", "Mix of All"])
+        difficulty = st.selectbox("Difficulty", ["Easy 🟢", "Medium 🟡", "Hard 🔴"])
+        q_type     = st.selectbox("Type", ["MCQs", "True/False", "Short Answer", "Mix of All"])
 
     if st.button("🎯 Quiz Generate Karo", key="btn_quiz_gen"):
         if not quiz_topic:
@@ -617,15 +383,13 @@ elif mode == "quiz":
             with st.spinner("Quiz ban raha hai... ⏳"):
                 system = (
                     "You are StudyMate quiz generator. "
-                    "Generate quiz questions in STRICT JSON format only. "
-                    "Return a JSON array like: "
-                    '[{"q": "Question text", "options": ["A) ...", "B) ...", "C) ...", "D) ..."], "answer": "A", "explanation": "..."}, ...] '
-                    "For True/False: options = ['True', 'False'], answer = 'True' or 'False'. "
-                    "For Short Answer: options = [], answer = 'short answer text'. "
-                    "No extra text outside JSON."
+                    "Generate quiz in STRICT JSON format only — no extra text, no markdown. "
+                    'Return array: [{"q":"Question","options":["A) ...","B) ...","C) ...","D) ..."],"answer":"A","explanation":"..."}] '
+                    "For True/False: options=['True','False'], answer='True' or 'False'. "
+                    "For Short Answer: options=[], answer='short text'."
                 )
-                query = f"Generate {num_q} {q_type} questions about '{quiz_topic}' at {difficulty} level."
-                raw = ask_gemini(query, system, api_key, max_tokens=2000)
+                query = f"Generate {num_q} {q_type} on '{quiz_topic}' at {difficulty} level."
+                raw = ask_groq(query, system, api_key, 2000)
 
             if raw:
                 try:
@@ -637,32 +401,26 @@ elif mode == "quiz":
                     st.session_state.quiz_score      = 0
                     st.rerun()
                 except Exception:
-                    # fallback: show raw
                     st.markdown(f'<div class="result-box">{raw}</div>', unsafe_allow_html=True)
                     st.download_button("📥 Download Quiz", raw, file_name=f"{quiz_topic}_quiz.txt")
 
-    # ── Render Quiz ──
     if st.session_state.quiz_questions:
         st.markdown("---")
         qs = st.session_state.quiz_questions
 
         for i, q in enumerate(qs):
-            with st.container():
-                st.markdown(f'<div class="quiz-question-num">Question {i+1} of {len(qs)}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="quiz-question-text">{q.get("q","")}</div>', unsafe_allow_html=True)
-
-                opts = q.get("options", [])
-                key  = f"q_{i}"
-
-                if opts:
-                    chosen = st.radio("", opts, key=key, index=None)
-                    if chosen is not None:
-                        st.session_state.quiz_answers[i] = chosen.split(")")[0].strip() if ")" in chosen else chosen
-                else:
-                    ans = st.text_input("Jawab:", key=key)
-                    st.session_state.quiz_answers[i] = ans
-
-                st.markdown("---")
+            st.markdown(f'<div class="quiz-question-num">Question {i+1} of {len(qs)}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="quiz-question-text">{q.get("q","")}</div>', unsafe_allow_html=True)
+            opts = q.get("options", [])
+            key  = f"q_{i}"
+            if opts:
+                chosen = st.radio("", opts, key=key, index=None)
+                if chosen is not None:
+                    st.session_state.quiz_answers[i] = chosen.split(")")[0].strip() if ")" in chosen else chosen
+            else:
+                ans = st.text_input("Jawab:", key=key)
+                st.session_state.quiz_answers[i] = ans
+            st.markdown("---")
 
         if not st.session_state.quiz_submitted:
             if st.button("✅ Submit Quiz", key="btn_submit"):
@@ -672,8 +430,8 @@ elif mode == "quiz":
                     given   = str(st.session_state.quiz_answers.get(i,"")).strip().upper()
                     if given and (given == correct or given in correct or correct in given):
                         score += 1
-                st.session_state.quiz_score     = score
-                st.session_state.quiz_submitted  = True
+                st.session_state.quiz_score    = score
+                st.session_state.quiz_submitted = True
                 st.rerun()
 
         if st.session_state.quiz_submitted:
@@ -681,13 +439,8 @@ elif mode == "quiz":
             score = st.session_state.quiz_score
             pct   = int(score / total * 100)
             emoji = "🏆" if pct >= 80 else "💪" if pct >= 50 else "📖"
+            st.markdown(f'<div class="score-badge">{emoji} Score: {score}/{total} | {pct}%</div>', unsafe_allow_html=True)
 
-            st.markdown(
-                f'<div class="score-badge">{emoji} Score: {score}/{total} &nbsp;|&nbsp; {pct}%</div>',
-                unsafe_allow_html=True
-            )
-
-            # Show correct answers
             with st.expander("📋 Correct Answers Dekho"):
                 for i, q in enumerate(qs):
                     correct  = q.get("answer","")
@@ -697,7 +450,7 @@ elif mode == "quiz":
                                str(correct).strip().upper() in str(given).strip().upper()
                     icon = "✅" if is_right else "❌"
                     st.markdown(f"**{icon} Q{i+1}:** {q.get('q','')}")
-                    st.markdown(f"&nbsp;&nbsp;Tumhara jawab: `{given}` | Correct: `{correct}`")
+                    st.markdown(f"&nbsp;&nbsp;Tumhara: `{given}` | Correct: `{correct}`")
                     if explain:
                         st.markdown(f"&nbsp;&nbsp;💡 _{explain}_")
                     st.markdown("---")
@@ -716,36 +469,33 @@ elif mode == "plan":
 
     col1, col2 = st.columns(2)
     with col1:
-        exam_sub   = st.text_input("Exam Subject", placeholder="e.g. Software Engineering Final")
-        days       = st.slider("Kitne din baad exam?", 1, 60, 7)
+        exam_sub = st.text_input("Exam Subject", placeholder="e.g. Software Engineering Final")
+        days     = st.slider("Kitne din baad exam?", 1, 60, 7)
     with col2:
-        hours      = st.slider("Roz kitne ghante padh sakte ho?", 1, 12, 3)
-        weak       = st.text_input("Weak Topics (optional)", placeholder="e.g. UML, Sorting Algorithms")
+        hours = st.slider("Roz kitne ghante?", 1, 12, 3)
+        weak  = st.text_input("Weak Topics (optional)", placeholder="e.g. UML, Sorting")
 
-    style = st.radio("Study Style:", ["Balanced", "Intensive (Exam ke paas)", "Relaxed"], horizontal=True)
+    style = st.radio("Study Style:", ["Balanced", "Intensive", "Relaxed"], horizontal=True)
 
     if st.button("📅 Study Plan Banao", key="btn_plan"):
         if not exam_sub:
             st.warning("Subject daalo!")
         else:
-            with st.spinner("Personalized plan ban raha hai... ⏳"):
+            with st.spinner("Plan ban raha hai... ⏳"):
                 system = (
                     "You are StudyMate study planner for Pakistani university students. "
-                    "Create a realistic, day-by-day study plan in Hinglish. "
-                    "Include: daily topics, time allocation, revision days, and motivational tips. "
-                    "Format with clear Day-wise headings and bullet points. "
-                    "Be practical — not overwhelming."
+                    "Create realistic day-by-day plan in Hinglish. "
+                    "Include daily topics, time allocation, revision days, tips. "
+                    "Use clear Day-wise headings and bullets. Be practical."
                 )
                 query = (
-                    f"Create a {days}-day {style} study plan for '{exam_sub}'. "
-                    f"Daily study time: {hours} hours. "
-                    f"Weak topics to focus on: {weak or 'none specified'}."
+                    f"Create {days}-day {style} study plan for '{exam_sub}'. "
+                    f"Daily time: {hours} hours. Weak topics: {weak or 'none'}."
                 )
-                result = ask_gemini(query, system, api_key, max_tokens=2500)
-
+                result = ask_groq(query, system, api_key, 2500)
             if result:
                 st.markdown(f'<div class="result-box">{result}</div>', unsafe_allow_html=True)
-                st.download_button("📥 Download Study Plan", result, file_name="study_plan.txt", key="dl_plan")
+                st.download_button("📥 Download Plan", result, file_name="study_plan.txt", key="dl_plan")
 
 # ══════════════════════════════════════════════════════════════
 #  💬  AI CHAT
@@ -754,36 +504,28 @@ elif mode == "chat":
     st.markdown('<div class="section-title">💬 AI Study Chat</div>', unsafe_allow_html=True)
     st.caption("Koi bhi study sawaal poocho — conversation yaad rakhi jayegi!")
 
-    # Render history
     for msg in st.session_state.chat_history:
         if msg["role"] == "user":
             st.markdown(f'<div class="chat-label-user">You</div><div class="chat-message-user">{msg["content"]}</div>', unsafe_allow_html=True)
         else:
             st.markdown(f'<div class="chat-label-ai">🎓 StudyMate</div><div class="chat-message-ai">{msg["content"]}</div>', unsafe_allow_html=True)
 
-    # Input
     user_msg = st.chat_input("Kuch bhi poocho...")
-
     if user_msg:
         st.session_state.chat_history.append({"role": "user", "content": user_msg})
-
-        # Build context from last 6 messages
         history_ctx = "\n".join(
             f"{'User' if m['role']=='user' else 'Assistant'}: {m['content']}"
             for m in st.session_state.chat_history[-6:]
         )
-
         system = (
             "You are StudyMate, a friendly AI study assistant for Pakistani university students. "
-            "Respond in Hinglish (mix of Urdu and English). "
-            "Be helpful, concise, and encouraging. "
-            "Remember the conversation context."
+            "Respond in Hinglish. Be helpful, concise, and encouraging."
         )
-        query = f"Conversation so far:\n{history_ctx}\n\nAnswer the user's latest message."
-
         with st.spinner("Soch raha hoon... ⏳"):
-            reply = ask_gemini(query, system, api_key, max_tokens=1500)
-
+            reply = ask_groq(
+                f"Conversation:\n{history_ctx}\n\nAnswer the user's latest message.",
+                system, api_key, 1500
+            )
         if reply:
             st.session_state.chat_history.append({"role": "assistant", "content": reply})
             st.rerun()
@@ -791,8 +533,8 @@ elif mode == "chat":
 # ─── FOOTER ────────────────────────────────────────────────────
 st.markdown("---")
 st.markdown(
-    "<p style='text-align:center; color:#2d6a4f; font-size:0.8rem; font-family:JetBrains Mono;'>"
-    "StudyMate AI v2.0 &nbsp;|&nbsp; Built by Huzaifa &nbsp;|&nbsp; Powered by Google Gemini"
+    "<p style='text-align:center; color:#2d6a4f; font-size:0.8rem;'>"
+    "StudyMate AI v2.0 &nbsp;|&nbsp; Built by Huzaifa &nbsp;|&nbsp; Powered by OpenRouter + LLaMA 3"
     "</p>",
     unsafe_allow_html=True
 )
