@@ -158,7 +158,7 @@ GROQ_MODELS = [
 
 def ask_groq(prompt: str, system: str, api_key: str, max_tokens: int = 2000) -> str | None:
     if not api_key:
-        st.error("⚠️ Sidebar mein Groq API key daalo!")
+        st.error("⚠️ Please enter your OpenRouter API key in the sidebar.")
         return None
 
     for model in GROQ_MODELS:
@@ -183,7 +183,7 @@ def ask_groq(prompt: str, system: str, api_key: str, max_tokens: int = 2000) -> 
             if r.status_code == 200:
                 return data["choices"][0]["message"]["content"]
             elif r.status_code == 429:
-                st.warning(f"⏳ {model} busy hai — next try ho raha hai...")
+                st.warning(f"⏳ {model} is busy — trying next model...")
                 time.sleep(2)
                 continue
             else:
@@ -193,7 +193,7 @@ def ask_groq(prompt: str, system: str, api_key: str, max_tokens: int = 2000) -> 
         except Exception as e:
             continue
 
-    st.error("❌ Koi model available nahi. API key check karo.")
+    st.error("❌ No models available. Please check your API key.")
     return None
 
 # ─── PDF EXTRACTOR ─────────────────────────────────────────────
@@ -212,9 +212,9 @@ def extract_pdf_text(uploaded_file) -> str:
             return "\n".join(p.extract_text() or "" for p in reader.pages)
         except ImportError:
             pass
-        return "PDF library nahi mili. requirements.txt mein pypdf add karo."
+        return "PDF library not found. Please add pypdf to requirements.txt."
     except Exception as e:
-        return f"PDF read nahi hua: {e}"
+        return f"Could not read PDF: {e}"
 
 # ─── SIDEBAR ───────────────────────────────────────────────────
 with st.sidebar:
@@ -227,24 +227,24 @@ with st.sidebar:
         help="Free key: openrouter.ai"
     )
     if api_key:
-        st.success("✅ API Key set!")
+        st.success("✅ Connected")
     else:
-        st.info("👆 openrouter.ai se free key lo")
+        st.info("Get your free key at openrouter.ai")
 
     st.markdown("---")
     st.markdown("### 📊 Session Stats")
     c1, c2 = st.columns(2)
-    c1.metric("Chat Msgs", len(st.session_state.chat_history))
+    c1.metric("Messages", len(st.session_state.chat_history))
     c2.metric("Quiz Score", str(st.session_state.quiz_score))
 
     st.markdown("---")
-    if st.button("🗑️ Chat Clear"):
+    if st.button("🗑️ Clear Chat"):
         st.session_state.chat_history = []
         st.rerun()
 
     st.markdown("---")
     st.markdown(
-        "<p style='font-size:0.78rem; color:#52b788;'>Built by <b>Huzaifa</b> 🚀<br/>Powered by OpenRouter + LLaMA</p>",
+        "<p style='font-size:0.78rem; color:#52b788;'>Built by <b>Huzaifa</b> 🚀<br/>Powered by OpenRouter AI</p>",
         unsafe_allow_html=True,
     )
 
@@ -252,15 +252,15 @@ with st.sidebar:
 st.markdown("""
 <div class="hero-header">
     <div class="hero-title">🎓 StudyMate AI</div>
-    <div class="hero-subtitle">Tumhara personal AI study assistant — Hinglish mein, bilkul free!</div>
+    <div class="hero-subtitle">Your intelligent study companion — powered by AI, built for students.</div>
 </div>
 """, unsafe_allow_html=True)
 
 # ─── MODE BUTTONS ──────────────────────────────────────────────
 MODES = {
-    "explain":   ("💡", "Topic Explain"),
-    "summarize": ("📝", "Notes Summarize"),
-    "quiz":      ("❓", "Quiz Mode"),
+    "explain":   ("💡", "Explain"),
+    "summarize": ("📝", "Summarize"),
+    "quiz":      ("❓", "Quiz"),
     "plan":      ("📅", "Study Plan"),
     "chat":      ("💬", "AI Chat"),
 }
@@ -279,7 +279,7 @@ mode = st.session_state.mode
 #  💡  TOPIC EXPLAIN
 # ══════════════════════════════════════════════════════════════
 if mode == "explain":
-    st.markdown('<div class="section-title">💡 Topic Explain Karo</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">💡 Topic Explainer</div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns([2, 1])
     with col1:
@@ -287,27 +287,27 @@ if mode == "explain":
             "Computer Science", "Mathematics", "Physics", "Chemistry",
             "Biology", "History", "English", "Networking", "Software Engineering", "Other"
         ])
-        topic = st.text_input("Topic", placeholder="e.g. Newton's Laws, Network Topology, OOP")
+        topic = st.text_input("Enter Topic", placeholder="e.g. Newton's Laws, Network Topology, OOP Concepts")
     with col2:
-        level = st.select_slider("Level", ["Beginner 🟢", "Intermediate 🟡", "Advanced 🔴"])
-        lang  = st.selectbox("Language", ["Hinglish", "English", "Urdu"])
+        level = st.select_slider("Level", ["Beginner", "Intermediate", "Advanced"])
+        lang  = st.selectbox("Language", ["English", "Simple English", "Urdu"])
 
-    with st.expander("📄 Ya PDF upload karo (optional)"):
-        pdf_file = st.file_uploader("PDF Upload", type=["pdf"], key="explain_pdf")
+    with st.expander("📄 Upload Reference Material (Optional)"):
+        pdf_file = st.file_uploader("Upload PDF", type=["pdf"], key="explain_pdf")
 
-    if st.button("✨ Explain Karo", key="btn_explain"):
+    if st.button("✨ Generate Explanation", key="btn_explain"):
         if not topic and not pdf_file:
-            st.warning("Topic daalo ya PDF upload karo!")
+            st.warning("Please enter a topic or upload a PDF.")
         else:
             context = ""
             if pdf_file:
-                with st.spinner("PDF pad raha hoon..."):
+                with st.spinner("Reading PDF..."):
                     context = extract_pdf_text(pdf_file)[:4000]
 
-            with st.spinner("AI soch raha hai... ⏳"):
+            with st.spinner("Generating explanation..."):
                 system = (
-                    f"You are StudyMate, a friendly AI study assistant for Pakistani university students. "
-                    f"Always respond in {lang} (mix of Urdu and English if Hinglish). "
+                    f"You are StudyMate, a friendly AI study assistant for university students. "
+                    f"Always respond in {lang}. "
                     f"Structure: 1) Simple definition 2) Easy explanation with example "
                     f"3) Key points bullet form 4) One common exam question. Be encouraging."
                 )
@@ -318,41 +318,41 @@ if mode == "explain":
 
             if result:
                 st.markdown(f'<div class="result-box">{result}</div>', unsafe_allow_html=True)
-                st.download_button("📥 Download Notes", result, file_name=f"{topic}_notes.txt", key="dl_explain")
+                st.download_button("📥 Download", result, file_name=f"{topic}_notes.txt", key="dl_explain")
 
 # ══════════════════════════════════════════════════════════════
 #  📝  NOTES SUMMARIZE
 # ══════════════════════════════════════════════════════════════
 elif mode == "summarize":
-    st.markdown('<div class="section-title">📝 Notes Summarize Karo</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">📝 Smart Summarizer</div>', unsafe_allow_html=True)
 
-    tab1, tab2 = st.tabs(["✏️ Text Paste Karo", "📄 PDF Upload Karo"])
+    tab1, tab2 = st.tabs(["✏️ Paste Text", "📄 Upload PDF"])
     with tab1:
-        notes = st.text_area("Notes paste karo:", height=220, placeholder="Apne notes yahan paste karo...")
+        notes = st.text_area("Your Notes", height=220, placeholder="Paste your study notes here...")
     with tab2:
-        pdf_up = st.file_uploader("PDF Upload", type=["pdf"], key="sum_pdf")
+        pdf_up = st.file_uploader("Upload PDF", type=["pdf"], key="sum_pdf")
         notes_from_pdf = ""
         if pdf_up:
-            with st.spinner("PDF se text nikal raha hoon..."):
+            with st.spinner("Extracting text from PDF..."):
                 notes_from_pdf = extract_pdf_text(pdf_up)
-            st.success(f"✅ PDF read ho gaya!")
+            st.success(f"✅ PDF loaded successfully!")
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        length = st.selectbox("Length", ["Short — 5 Points", "Medium — 10 Points", "Detailed"])
+        length = st.selectbox("Length", ["Brief (5 Key Points)", "Standard (10 Points)", "Comprehensive"])
     with col2:
-        lang2 = st.selectbox("Language", ["Hinglish", "English", "Urdu"], key="lang_sum")
+        lang2 = st.selectbox("Language", ["English", "Simple English", "Urdu"], key="lang_sum")
     with col3:
-        focus = st.selectbox("Focus", ["Key Concepts", "Exam Points", "Definitions", "All"])
+        focus = st.selectbox("Focus", ["Key Concepts", "Exam Preparation", "Definitions & Terms", "Complete Overview"])
 
-    if st.button("📝 Summarize Karo", key="btn_sum"):
+    if st.button("📝 Summarize", key="btn_sum"):
         raw = notes or notes_from_pdf
         if not raw.strip():
-            st.warning("Notes paste karo ya PDF upload karo!")
+            st.warning("Please paste notes or upload a PDF.")
         else:
-            with st.spinner("Notes process ho rahe hain... ⏳"):
+            with st.spinner("Summarizing your notes..."):
                 system = (
-                    f"You are StudyMate for Pakistani university students. "
+                    f"You are StudyMate for university students. "
                     f"Summarize in {lang2}. Focus on {focus}. "
                     f"Use clear headings, bullet points, bold keywords. Make it exam-ready."
                 )
@@ -365,21 +365,21 @@ elif mode == "summarize":
 #  ❓  QUIZ MODE
 # ══════════════════════════════════════════════════════════════
 elif mode == "quiz":
-    st.markdown('<div class="section-title">❓ Interactive Quiz Mode</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">❓ Quiz Generator</div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
     with col1:
-        quiz_topic = st.text_input("Topic", placeholder="e.g. OOP, Networking, Photosynthesis")
-        num_q      = st.slider("Questions", 3, 10, 5)
+        quiz_topic = st.text_input("Quiz Topic", placeholder="e.g. Object-Oriented Programming, Networking Basics")
+        num_q      = st.slider("Number of Questions", 3, 10, 5)
     with col2:
-        difficulty = st.selectbox("Difficulty", ["Easy 🟢", "Medium 🟡", "Hard 🔴"])
+        difficulty = st.selectbox("Difficulty Level", ["Easy", "Medium", "Hard"])
         q_type     = st.selectbox("Type", ["MCQs", "True/False", "Short Answer", "Mix of All"])
 
-    if st.button("🎯 Quiz Generate Karo", key="btn_quiz_gen"):
+    if st.button("🎯 Generate Quiz", key="btn_quiz_gen"):
         if not quiz_topic:
-            st.warning("Topic daalo!")
+            st.warning("Please enter a topic.")
         else:
-            with st.spinner("Quiz ban raha hai... ⏳"):
+            with st.spinner("Generating your quiz..."):
                 system = (
                     "You are StudyMate quiz generator. "
                     "Generate quiz in STRICT JSON format only — no extra text, no markdown. "
@@ -413,16 +413,16 @@ elif mode == "quiz":
             opts = q.get("options", [])
             key  = f"q_{i}"
             if opts:
-                chosen = st.radio("", opts, key=key, index=None)
+                chosen = st.radio("Select your answer:", opts, key=key, index=None)
                 if chosen is not None:
                     st.session_state.quiz_answers[i] = chosen.split(")")[0].strip() if ")" in chosen else chosen
             else:
-                ans = st.text_input("Jawab:", key=key)
+                ans = st.text_input("Your Answer:", key=key)
                 st.session_state.quiz_answers[i] = ans
             st.markdown("---")
 
         if not st.session_state.quiz_submitted:
-            if st.button("✅ Submit Quiz", key="btn_submit"):
+            if st.button("✅ Submit Answers", key="btn_submit"):
                 score = 0
                 for i, q in enumerate(qs):
                     correct = str(q.get("answer","")).strip().upper()
@@ -440,7 +440,7 @@ elif mode == "quiz":
             emoji = "🏆" if pct >= 80 else "💪" if pct >= 50 else "📖"
             st.markdown(f'<div class="score-badge">{emoji} Score: {score}/{total} | {pct}%</div>', unsafe_allow_html=True)
 
-            with st.expander("📋 Correct Answers Dekho"):
+            with st.expander("📋 View Answer Key"):
                 for i, q in enumerate(qs):
                     correct  = q.get("answer","")
                     given    = st.session_state.quiz_answers.get(i,"")
@@ -449,12 +449,12 @@ elif mode == "quiz":
                                str(correct).strip().upper() in str(given).strip().upper()
                     icon = "✅" if is_right else "❌"
                     st.markdown(f"**{icon} Q{i+1}:** {q.get('q','')}")
-                    st.markdown(f"&nbsp;&nbsp;Tumhara: `{given}` | Correct: `{correct}`")
+                    st.markdown(f"&nbsp;&nbsp;Your answer: `{given}` &nbsp;|&nbsp; Correct: `{correct}`")
                     if explain:
                         st.markdown(f"&nbsp;&nbsp;💡 _{explain}_")
                     st.markdown("---")
 
-            if st.button("🔄 Naya Quiz", key="btn_new_quiz"):
+            if st.button("🔄 New Quiz", key="btn_new_quiz"):
                 st.session_state.quiz_questions = []
                 st.session_state.quiz_answers   = {}
                 st.session_state.quiz_submitted  = False
@@ -464,26 +464,26 @@ elif mode == "quiz":
 #  📅  STUDY PLAN
 # ══════════════════════════════════════════════════════════════
 elif mode == "plan":
-    st.markdown('<div class="section-title">📅 Personalized Study Plan</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">📅 Study Planner</div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
     with col1:
-        exam_sub = st.text_input("Exam Subject", placeholder="e.g. Software Engineering Final")
-        days     = st.slider("Kitne din baad exam?", 1, 60, 7)
+        exam_sub = st.text_input("Subject / Exam Name", placeholder="e.g. Software Engineering Final Exam")
+        days     = st.slider("Days until exam", 1, 60, 7)
     with col2:
-        hours = st.slider("Roz kitne ghante?", 1, 12, 3)
-        weak  = st.text_input("Weak Topics (optional)", placeholder="e.g. UML, Sorting")
+        hours = st.slider("Daily study hours", 1, 12, 3)
+        weak  = st.text_input("Weak Topics (optional)", placeholder="e.g. UML Diagrams, Sorting Algorithms")
 
-    style = st.radio("Study Style:", ["Balanced", "Intensive", "Relaxed"], horizontal=True)
+    style = st.radio("Study Style", ["Balanced", "Intensive (Exam Mode)", "Relaxed"], horizontal=True)
 
-    if st.button("📅 Study Plan Banao", key="btn_plan"):
+    if st.button("📅 Generate Study Plan", key="btn_plan"):
         if not exam_sub:
-            st.warning("Subject daalo!")
+            st.warning("Please enter a subject.")
         else:
-            with st.spinner("Plan ban raha hai... ⏳"):
+            with st.spinner("Creating your personalized study plan..."):
                 system = (
-                    "You are StudyMate study planner for Pakistani university students. "
-                    "Create realistic day-by-day plan in Hinglish. "
+                    "You are StudyMate study planner for university students. "
+                    "Create a realistic day-by-day study plan in English. "
                     "Include daily topics, time allocation, revision days, tips. "
                     "Use clear Day-wise headings and bullets. Be practical."
                 )
@@ -500,8 +500,8 @@ elif mode == "plan":
 #  💬  AI CHAT
 # ══════════════════════════════════════════════════════════════
 elif mode == "chat":
-    st.markdown('<div class="section-title">💬 AI Study Chat</div>', unsafe_allow_html=True)
-    st.caption("Koi bhi study sawaal poocho — conversation yaad rakhi jayegi!")
+    st.markdown('<div class="section-title">💬 AI Study Assistant</div>', unsafe_allow_html=True)
+    st.caption("Your AI-powered study assistant. Ask any question and get instant, detailed answers.")
 
     for msg in st.session_state.chat_history:
         if msg["role"] == "user":
@@ -509,7 +509,7 @@ elif mode == "chat":
         else:
             st.markdown(f'<div class="chat-label-ai">🎓 StudyMate</div><div class="chat-message-ai">{msg["content"]}</div>', unsafe_allow_html=True)
 
-    user_msg = st.chat_input("Kuch bhi poocho...")
+    user_msg = st.chat_input("Ask a study question...")
     if user_msg:
         st.session_state.chat_history.append({"role": "user", "content": user_msg})
         history_ctx = "\n".join(
@@ -517,10 +517,10 @@ elif mode == "chat":
             for m in st.session_state.chat_history[-6:]
         )
         system = (
-            "You are StudyMate, a friendly AI study assistant for Pakistani university students. "
-            "Respond in Hinglish. Be helpful, concise, and encouraging."
+            "You are StudyMate, a friendly AI study assistant for university students. "
+            "Respond in clear English. Be helpful, concise, and encouraging."
         )
-        with st.spinner("Soch raha hoon... ⏳"):
+        with st.spinner("Thinking..."):
             reply = ask_groq(
                 f"Conversation:\n{history_ctx}\n\nAnswer the user's latest message.",
                 system, api_key, 1500
@@ -533,7 +533,7 @@ elif mode == "chat":
 st.markdown("---")
 st.markdown(
     "<p style='text-align:center; color:#2d6a4f; font-size:0.8rem;'>"
-    "StudyMate AI v2.0 &nbsp;|&nbsp; Built by Huzaifa &nbsp;|&nbsp; Powered by OpenRouter + LLaMA 3"
+    "StudyMate AI &nbsp;·&nbsp; Built by Huzaifa &nbsp;·&nbsp; Powered by OpenRouter AI"
     "</p>",
     unsafe_allow_html=True
 )
