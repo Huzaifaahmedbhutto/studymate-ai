@@ -234,16 +234,12 @@ def extract_pdf_text(uploaded_file) -> str:
 with st.sidebar:
     st.markdown("## 🎓 StudyMate AI")
     st.markdown("---")
-    api_key = st.text_input(
-        "🔑 OpenRouter API Key",
-        type="password",
-        placeholder="sk-or-...",
-        help="Free key: openrouter.ai"
-    )
-    if api_key:
+    try:
+        api_key = st.secrets["OPENROUTER_API_KEY"]
         st.success("✅ Connected")
-    else:
-        st.info("Get your free key at openrouter.ai")
+    except:
+        api_key = None
+        st.warning("⚠️ Service unavailable. Contact admin.")
 
     st.markdown("---")
     st.markdown("### 📊 Session Stats")
